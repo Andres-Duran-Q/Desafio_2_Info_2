@@ -1,21 +1,48 @@
-#include "termax.h"
+#include "Surtidor.h"
 
 int main() {
-    // Crear un objeto Surtidor
-    Surtidor surtidor1(1, 5); // Código 1, Modelo 5
+    int opcion;
+    bool surtidor_creado = false;
+    Surtidor* surtidor1 = nullptr; // Puntero para el surtidor
 
-    // Registrar ventas
-    surtidor1.nueva_venta(20, 1, 2, 123, 200);  // Venta 1: 20 litros, categoría 1, pago con tarjeta, cliente 123, $500
-    surtidor1.nueva_venta(15, 2, 1, 200, 200);  // Venta 2: 15 litros, categoría 2, pago en efectivo, cliente 456, $300
+    while (true) {
+        std::cout << "\nMenu:\n";
+        std::cout << "1. Crear surtidor\n";
+        std::cout << "0. Salir\n";
+        std::cout << "Seleccione una opcion: ";
+        std::cin >> opcion;
 
-    // Imprimir información básica
-    surtidor1.print_codigo_id();               // Imprime el código del surtidor
-    surtidor1.print_modelo_maquina();          // Imprime el modelo del surtidor
-    surtidor1.print_cantidad_ventas();         // Imprime la cantidad de ventas realizadas
+        if (opcion == 1) {
+            if (!surtidor_creado) {
+                // Crear un objeto Surtidor
+                surtidor1 = new Surtidor(1, "addq1234");
+                surtidor_creado = true;
+                std::cout << "\nSurtidor creado exitosamente.\n";
 
-    // Mostrar detalles de ventas
-    surtidor1.print_ventas(0);                 // Imprime la primera venta
-    surtidor1.print_ventas(1);                 // Imprime la segunda venta
+                // Registrar algunas ventas
+                surtidor1->nueva_venta(20, "Regular", "Efectivo", 1117554456, 500);
+                surtidor1->nueva_venta(15, "Premium", "TDebito", 40079781, 600);
+                surtidor1->nueva_venta(15, "EcoExtra", "TCredito", 123456789, 800);
+
+                // Imprimir información básica del surtidor
+                surtidor1->print_codigo_id();
+                surtidor1->print_modelo_maquina();
+                surtidor1->print_ventas();
+            } else {
+                std::cout << "El surtidor ya ha sido creado.\n";
+            }
+        } else if (opcion == 0) {
+            std::cout << "Saliendo del programa...\n";
+            break;
+        } else {
+            std::cout << "Opcion invalida. Por favor, seleccione 1 o 0.\n";
+        }
+    }
+
+    // Liberar memoria del surtidor si fue creado
+    if (surtidor1 != nullptr) {
+        delete surtidor1;
+    }
 
     return 0;
 }
