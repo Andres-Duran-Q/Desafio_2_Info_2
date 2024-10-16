@@ -18,11 +18,11 @@ using namespace std;
 
 struct Venta {
     int ano, mes, dia, hora, minuto;
-    uint8_t cantidad_combustible;
-    string categoria_combustible;
-    string metodo_pago;
+    uint16_t cantidad_combustible;
+    uint16_t categoria_combustible;
+    uint16_t metodo_pago;
     uint32_t id_cliente;
-    uint16_t cantidad_dinero;
+    uint32_t cantidad_dinero;
 };
 
 // ============================================================
@@ -33,24 +33,24 @@ class Surtidor {
 private:
     uint16_t codigo_id;
     string modelo_maquina;
-    uint8_t cantidad_ventas;
+    uint16_t cantidad_ventas;
     bool estado;
     Venta* ventas;
 
 public:
-
+    // Constructor
     Surtidor(uint16_t codigo, string modelo);
+    // Destructor
     ~Surtidor();
-
+    // Getters
     uint16_t obtener_codigo() { return codigo_id; }
     string obtener_modelo() { return modelo_maquina; }
-    uint8_t obtener_cantidad_ventas() { return cantidad_ventas; }
+    uint16_t obtener_cantidad_ventas() { return cantidad_ventas; }
     bool obtener_estado() { return estado; }
-
-
+    // setters
     void modificar_estado(bool nuevo_estado){estado = nuevo_estado;}
-
-    void nueva_venta(uint8_t cantidad_combustible, string categoria_combustible, string metodo_pago, uint32_t id_cliente, uint16_t cantidad_dinero);
+    // Otros
+    void nueva_venta(uint16_t cantidad_combustible, uint16_t categoria_combustible, uint16_t metodo_pago, uint32_t id_cliente, uint32_t cantidad_dinero);
     void print_codigo_id();
     void print_modelo_maquina();
     void print_cantidad_ventas();
@@ -68,11 +68,13 @@ Surtidor::Surtidor(uint16_t codigo, string modelo)
 
 // Destructor
 Surtidor::~Surtidor() {
-    delete[] ventas; // Liberar memoria
+    if (ventas != nullptr) {
+        delete[] ventas;  // Liberar memoria solo si se ha usado
+    }
 }
 
 // Registrar una nueva venta
-void Surtidor::nueva_venta(uint8_t cantidad_combustible, string categoria_combustible, string metodo_pago, uint32_t id_cliente, uint16_t cantidad_dinero) {
+void Surtidor::nueva_venta(uint16_t cantidad_combustible, uint16_t categoria_combustible, uint16_t metodo_pago, uint32_t id_cliente, uint32_t cantidad_dinero) {
     Venta* ventas_anteriores = ventas;
     ventas = new Venta[cantidad_ventas + 1];
 
@@ -100,7 +102,7 @@ void Surtidor::nueva_venta(uint8_t cantidad_combustible, string categoria_combus
 
 // Imprimir código ID
 void Surtidor::print_codigo_id() {
-    std::cout << "Codigo: " << static_cast<int>(codigo_id) << std::endl;
+    std::cout << "Codigo: " << codigo_id << std::endl;
 }
 
 // Imprimir modelo de la máquina
@@ -116,25 +118,49 @@ void Surtidor::print_cantidad_ventas() {
 // Imprimir todas las ventas realizadas
 void Surtidor::print_ventas() {
     if (cantidad_ventas < 1) {
-        std::cout << "\nEl surtidor con codigo " << static_cast<int>(codigo_id) << " no ha realizado ventas" << std::endl;
+        cout << "\nEl surtidor con codigo " << codigo_id << " no ha realizado ventas" << endl;
         return;
     }
 
-    for (uint8_t i = 0; i < cantidad_ventas; ++i) {
+    for (uint16_t i = 0; i < cantidad_ventas; ++i) {
         const Venta& venta = ventas[i];
-        std::cout << "\nVenta Numero " << i + 1 << " del Surtidor con Codigo " << static_cast<int>(codigo_id) << std::endl;
-        std::cout << "Fecha y Hora: " << venta.ano << "/" << venta.mes << "/" << venta.dia
-                  << " " << venta.hora << ":" << venta.minuto << std::endl;
-        std::cout << "Combustible: " << static_cast<int>(venta.cantidad_combustible)
-                  << " litros, Tipo: " << venta.categoria_combustible << std::endl;
-        std::cout << "Metodo de pago: " << venta.metodo_pago
-                  << ", Cliente ID: " << static_cast<int>(venta.id_cliente)
-                  << ", Cantidad de dinero: " << venta.cantidad_dinero << std::endl;
-        std::cout << "____________________________________________________________________________________________________" << std::endl;
+
+        // Traducir el tipo de combustible
+        string tipo_combustible;
+        switch (venta.categoria_combustible) {
+        case 0: tipo_combustible = "Regular"; break;
+        case 1: tipo_combustible = "Premium"; break;
+        case 2: tipo_combustible = "EcoExtra"; break;
+        default: tipo_combustible = "Desconocido"; break;
+        }
+
+        // Traducir el metodo de pago
+        string metodo_pago;
+        switch (venta.metodo_pago) {
+        case 0: metodo_pago = "Efectivo"; break;
+        case 1: metodo_pago = "Tarjeta de Credito"; break;
+        case 2: metodo_pago = "Tarjeta de Debito"; break;
+        default: metodo_pago = "Metodo Desconocido"; break;
+        }
+
+        // Imprimir factura
+        cout << "\n=========================== FACTURA DE VENTA ===========================\n";
+        cout << "Surtidor Codigo: " << codigo_id << " | Venta Nro: " << i + 1 << "\n";
+        cout << "Fecha: " << venta.ano << "/" << venta.mes << "/" << venta.dia
+             << " | Hora: " << venta.hora << ":" << (venta.minuto < 10 ? "0" : "") << venta.minuto << "\n";
+        cout << "--------------------------------------------------------------------------\n";
+        cout << "Cantidad de combustible: " << venta.cantidad_combustible << " litros\n";
+        cout << "Tipo de combustible: " << tipo_combustible << "\n";
+        cout << "--------------------------------------------------------------------------\n";
+        cout << "Metodo de pago: " << metodo_pago << "\n";
+        cout << "ID Cliente: " << venta.id_cliente << "\n";
+        cout << "Total: " << venta.cantidad_dinero << " Pesos Col \n";
+        cout << "==========================================================================\n";
     }
 
-    std::cout << "\nSe han mostrado todas las ventas del surtidor con codigo " << static_cast<int>(codigo_id) << std::endl;
+    cout << "\nSe han mostrado todas las ventas del surtidor con codigo " << codigo_id << endl;
 }
+
 
 
 #endif // SURTIDOR_H
