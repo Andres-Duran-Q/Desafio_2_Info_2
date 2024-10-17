@@ -134,7 +134,7 @@ int main() {
             estacion.historico_transacciones();
             break;
         case 8:
-            estacion.mostrarInformacionSurtidores(); // Llamada a la nueva función
+            estacion.mostrar_informacion_surtidores(); // Llamada a la nueva función
             break;
         case 0:
             cout << "Saliendo del programa." << endl;
