@@ -53,6 +53,7 @@ public:
 
     // Otros metodos
     void nueva_venta(uint16_t cantidad_combustible, uint16_t categoria_combustible, uint16_t metodo_pago, uint32_t id_cliente, uint32_t cantidad_dinero);
+    uint32_t datos_venta(uint16_t venta, uint16_t dato);
     void print_codigo_id();                      // Imprime el codigo del surtidor
     void print_modelo_maquina();                 // Imprime el modelo de la maquina
     void print_cantidad_ventas();                // Imprime la cantidad total de ventas realizadas
@@ -104,6 +105,35 @@ void Surtidor::nueva_venta(uint16_t cantidad_combustible, uint16_t categoria_com
     // Liberar la memoria del arreglo anterior
     delete[] ventas_anteriores;
 }
+
+uint32_t Surtidor::datos_venta(uint16_t venta, uint16_t dato) {
+    // Verificar si el índice de la venta es válido
+    if (venta < 0 || venta >= cantidad_ventas) {
+        cout << "Indice de venta no válido." << endl;
+        return 0;  // Devolver un valor por defecto si el índice no es válido
+    }
+
+    // Obtener la venta correspondiente al índice
+    Venta venta_consultada = ventas[venta];
+
+    // Devolver el valor basado en el tipo de dato
+    switch (dato) {
+    case 1: return venta_consultada.ano;                   // Año
+    case 2: return venta_consultada.mes;                   // Mes
+    case 3: return venta_consultada.dia;                   // Día
+    case 4: return venta_consultada.hora;                  // Hora
+    case 5: return venta_consultada.minuto;                // Minuto
+    case 6: return venta_consultada.cantidad_combustible;  // Cantidad de combustible
+    case 7: return venta_consultada.categoria_combustible; // Categoría de combustible
+    case 8: return venta_consultada.metodo_pago;           // Método de pago
+    case 9: return venta_consultada.id_cliente;    // ID Cliente (truncado a 16 bits si es necesario)
+    case 10: return venta_consultada.cantidad_dinero;  // Cantidad de dinero (truncado a 16 bits si es necesario)
+    default:
+        cout << "Dato no válido." << endl;
+        return 0;  // Devolver un valor por defecto si el dato no es válido
+    }
+}
+
 
 // Imprimir el codigo del surtidor
 void Surtidor::print_codigo_id() {
