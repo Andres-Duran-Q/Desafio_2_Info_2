@@ -40,7 +40,7 @@ public:
     // Destructor
     ~Estacion_servicio();
 
-    // Getters (metodos de acceso)
+    // Getters (metodos para obtener los valores de los atributos)
     string obtener_nombre() {return nombre_id;}                // Retorna el nombre de la estacion
     uint16_t obtener_codigo() {return codigo_id;}              // Retorna el codigo de la estacion
     string obtener_gerente() {return gerente;}                 // Retorna el nombre del gerente
@@ -57,7 +57,7 @@ public:
     void historico_transacciones();                            // Muestra el historico de transacciones de la estacion
     void generar_tanque_central();                             // Genera el tanque central de la estacion
     void reporte_ventas_tanque();                              // Reporta las ventas totales de los tanques
-    void simular_venta(uint32_t precio_combustible, uint16_t categoria_combustible); // Simula una venta de combustible
+    void simular_venta(uint16_t precio_combustible, uint16_t categoria_combustible); // Simula una venta de combustible
     void mostrar_informacion_surtidores();                     // Muestra la informacion de todos los surtidores
 };
 
@@ -220,7 +220,7 @@ void Estacion_servicio::reporte_ventas_tanque() {
 }
 
 // Función para simular una venta
-void Estacion_servicio::simular_venta(uint32_t precio_combustible, uint16_t categoria_combustible){
+void Estacion_servicio::simular_venta(uint16_t precio_combustible, uint16_t categoria_combustible){
     uint16_t cantidad_combustible = (rand()%18)+3;  // Genera una cantidad aleatoria de combustible
     int* surtidores_activos = new int [numero_surtidores];  // Lista de surtidores activos
     uint16_t contador_surtidor = 0;

@@ -10,9 +10,9 @@ using namespace std;
 // Estructura para representar un tanque de almacenamiento de combustible
 // ============================================================
 struct tipos_combustible {
-    uint16_t Regular;   // Precio del combustible Regular
-    uint16_t Premium;   // Precio del combustible Premium
-    uint16_t EcoExtra;  // Precio del combustible EcoExtra
+    uint32_t Regular;   // Precio del combustible Regular
+    uint32_t Premium;   // Precio del combustible Premium
+    uint32_t EcoExtra;  // Precio del combustible EcoExtra
 };
 
 // ============================================================
@@ -32,10 +32,10 @@ public:
     // Destructor
     ~Red_nacional();
 
-    // Getters (metodos de acceso)
+    // Getters (metodos para obtener los valores de los atributos)
     uint16_t obtener_numero_estaciones(){return numero_estaciones;}
     Estacion_servicio* obtener_estacion(int numero_estacion){return Estaciones[numero_estacion];}
-    uint16_t obtener_precio (int Region, int Tipo) {
+    uint16_t obtener_precio (uint16_t Region, uint16_t Tipo) {
         switch(Tipo) {
         case 0:  // Regular
             return Precios_region[Region].Regular;
@@ -52,7 +52,7 @@ public:
     void agregar_estacion(string nombre, string gerente, uint16_t region, float Latitud, float Longitud);
     void eliminar_estacion(uint16_t estacion);
     void fijar_precio(uint16_t Region, uint16_t Tipo, uint16_t NuevoPrecio);
-    void Ventas();
+    void ventas_todas_estaciones_pais();
 };
 
 // ============================================================
@@ -61,18 +61,22 @@ public:
 
 Red_nacional::Red_nacional() : numero_estaciones(0), Estaciones(nullptr) {
     // se iniciliza con un precio de combustible base
-    uint16_t precio = 10000;
+    uint16_t precio = 2600;
     for (uint16_t i = 0; i < 3; i++) {
         Precios_region[i].Regular = precio;
-        Precios_region[i].Premium = precio + 2000;
-        Precios_region[i].EcoExtra = precio + 3000;
-        precio += 1000; // Aumenta el precio base por región
+        Precios_region[i].Premium = precio + 500;
+        Precios_region[i].EcoExtra = precio + 1000;
+        precio += 300; // Aumenta el precio base por región
     }
 }
 
 Red_nacional::~Red_nacional() {
-    delete[] Estaciones;
+    for (uint16_t i = 0; i < numero_estaciones; i++) {
+        delete Estaciones[i];  // Libera la memoria de cada estacion
+    }
+    delete[] Estaciones;  // Luego libera el arreglo de punteros
 }
+
 
 
 void Red_nacional::agregar_estacion(string nombre, string gerente, uint16_t region, float Latitud, float Longitud) {
@@ -152,13 +156,13 @@ void Red_nacional::eliminar_estacion(uint16_t estacion){
 
 void Red_nacional::fijar_precio(uint16_t region, uint16_t tipo, uint16_t nuevo_precio) {
     switch (tipo) {
-    case 1:
+    case 0:
         Precios_region[region].Regular = nuevo_precio;
         break;
-    case 2:
+    case 1:
         Precios_region[region].Premium = nuevo_precio;
         break;
-    case 3:
+    case 2:
         Precios_region[region].EcoExtra = nuevo_precio;
         break;
     default:
@@ -167,7 +171,10 @@ void Red_nacional::fijar_precio(uint16_t region, uint16_t tipo, uint16_t nuevo_p
     }
 }
 
-void Red_nacional::Ventas() {
+#include <iostream>
+using namespace std;
+
+void Red_nacional::ventas_todas_estaciones_pais() {
     tipos_combustible litros_pais{0, 0, 0};  // Acumuladores de litros para todo el país
     tipos_combustible dinero_pais{0, 0, 0};  // Acumuladores de dinero para todo el país
 
@@ -177,17 +184,16 @@ void Red_nacional::Ventas() {
     tipos_combustible litros_surtidor{0, 0, 0};  // Acumuladores de litros por surtidor
     tipos_combustible dinero_surtidor{0, 0, 0};  // Acumuladores de dinero por surtidor
 
-    std::cout << "Ventas en cada E/S del pais\n";
+    cout << "Ventas detalladas por estacion:\n";
 
     // Recorre todas las estaciones
     for (short unsigned int i = 0; i < numero_estaciones; i++) {
-        std::cout << "_______________________________________\nEstación "
-                  << Estaciones[i]->obtener_nombre() << " (" << Estaciones[i]->obtener_codigo() << ")\n";
-        std::cout << "Surtidor | Litros Regular | $ Regular | Litros Premium | $ Premium | Litros EcoExtra | $ EcoExtra\n";
+        cout << "\nEstacion: " << Estaciones[i]->obtener_nombre()
+        << " (Codigo: " << Estaciones[i]->obtener_codigo() << ")\n";
 
         // Recorre todos los surtidores de la estación
         for (short unsigned int j = 0; j < Estaciones[i]->obtener_numero_surtidores(); j++) {
-            std::cout << Estaciones[i]->obtener_surtidor(j)->obtener_codigo() << "\t|";
+            cout << "  Surtidor " << Estaciones[i]->obtener_surtidor(j)->obtener_codigo() << ":\n";
 
             // Resetear acumuladores por surtidor
             litros_surtidor = {0, 0, 0};
@@ -195,9 +201,9 @@ void Red_nacional::Ventas() {
 
             // Recorre todas las ventas del surtidor
             for (short unsigned int k = 0; k < Estaciones[i]->obtener_surtidor(j)->obtener_cantidad_ventas(); k++) {
-                uint16_t litros_vendidos = Estaciones[i]->obtener_surtidor(j)->datos_venta(k, 10);  // Litros vendidos
+                uint16_t litros_vendidos = Estaciones[i]->obtener_surtidor(j)->datos_venta(k, 6);  // Litros vendidos
                 uint16_t tipo_combustible = Estaciones[i]->obtener_surtidor(j)->datos_venta(k, 7);  // Tipo de combustible
-                uint32_t cantidad_vendida = Estaciones[i]->obtener_surtidor(j)->datos_venta(k, 11); // Dinero generado
+                uint32_t cantidad_vendida = Estaciones[i]->obtener_surtidor(j)->datos_venta(k, 10); // Dinero generado
 
                 // Acumular litros y dinero según el tipo de combustible
                 switch (tipo_combustible) {
@@ -216,10 +222,10 @@ void Red_nacional::Ventas() {
                 }
             }
 
-            // Imprimir ventas por surtidor (litros y dinero)
-            std::cout << litros_surtidor.Regular << " L\t| $" << dinero_surtidor.Regular << "\t| "
-                      << litros_surtidor.Premium << " L\t| $" << dinero_surtidor.Premium << "\t| "
-                      << litros_surtidor.EcoExtra << " L\t| $" << dinero_surtidor.EcoExtra << "\n";
+            // Imprimir detalles del surtidor
+            cout << "    Regular: " << litros_surtidor.Regular << " L, $" << dinero_surtidor.Regular << "\n";
+            cout << "    Premium: " << litros_surtidor.Premium << " L, $" << dinero_surtidor.Premium << "\n";
+            cout << "    EcoExtra: " << litros_surtidor.EcoExtra << " L, $" << dinero_surtidor.EcoExtra << "\n";
 
             // Acumular al total por estación
             litros_estacion.Regular += litros_surtidor.Regular;
@@ -230,10 +236,11 @@ void Red_nacional::Ventas() {
             dinero_estacion.EcoExtra += dinero_surtidor.EcoExtra;
         }
 
-        // Imprimir total por estación (litros y dinero)
-        std::cout << "Total\t| " << litros_estacion.Regular << " L\t| $" << dinero_estacion.Regular
-                  << "\t| " << litros_estacion.Premium << " L\t| $" << dinero_estacion.Premium
-                  << "\t| " << litros_estacion.EcoExtra << " L\t| $" << dinero_estacion.EcoExtra << "\n";
+        // Imprimir total por estación
+        cout << "  Total en la estacion:\n";
+        cout << "    Regular: " << litros_estacion.Regular << " L, $" << dinero_estacion.Regular << "\n";
+        cout << "    Premium: " << litros_estacion.Premium << " L, $" << dinero_estacion.Premium << "\n";
+        cout << "    EcoExtra: " << litros_estacion.EcoExtra << " L, $" << dinero_estacion.EcoExtra << "\n";
 
         // Acumular al total del país
         litros_pais.Regular += litros_estacion.Regular;
@@ -248,10 +255,11 @@ void Red_nacional::Ventas() {
         dinero_estacion = {0, 0, 0};
     }
 
-    // Imprimir total acumulado del país (litros y dinero)
-    std::cout << "_______________________________________________________________________________\nPais\t| " << litros_pais.Regular << " L\t| $"
-              << dinero_pais.Regular << "\t| " << litros_pais.Premium << " L\t| $" << dinero_pais.Premium
-              << "\t| " << litros_pais.EcoExtra << " L\t| $" << dinero_pais.EcoExtra << "\n";
+    // Imprimir total acumulado del país
+    cout << "\nTotal acumulado en todo el pais:\n";
+    cout << "  Regular: " << litros_pais.Regular << " L, $" << dinero_pais.Regular << "\n";
+    cout << "  Premium: " << litros_pais.Premium << " L, $" << dinero_pais.Premium << "\n";
+    cout << "  EcoExtra: " << litros_pais.EcoExtra << " L, $" << dinero_pais.EcoExtra << "\n";
 }
 
 

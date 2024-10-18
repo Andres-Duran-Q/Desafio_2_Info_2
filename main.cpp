@@ -2,263 +2,20 @@
 // Librerias
 // ============================================================
 #include <iostream>
-#include <string>
 #include <stdexcept>  // Necesaria para lanzar y manejar excepciones estandar
 #include "Red_nacional.h"  // Asegurate de que este archivo exista y esté correctamente implementado
-
+#include "Funciones_menu.h"
 using namespace std;
 
-
 // ============================================================
-// Funciones
+// Funciones para el menu
 // ============================================================
+void mostrar_menu_principal();
+void mostrar_menu_gestion_Red();
+void mostrar_menu_estaciones_servicio();
 
-// Plantilla de función para validar que una opción está dentro de un rango específico
-template <typename T>
-bool OpcionValida(T valor, T max, T min) {
-    return (valor >= min && valor <= max);
-}
-
-// Funcion para mostrar el menu principal del sistema
-void mostrar_menu_principal() {
-    cout << "\nEscoja una opcion:\n";
-    cout << "0. Salir\n";
-    cout << "1. Gestion de Red\n";
-    cout << "2. Gestion de Estaciones de Servicio\n";
-    cout << "3. Simulacion de ventas\n";
-    cout << "Opcion: ";
-}
-
-// Funcion para mostrar el menu de gestion de la Red
-void mostrar_menu_gestion_Red() {
-    cout << "\nEscoja una opcion:\n";
-    cout << "0. Salir\n";
-    cout << "1. Agregar Estacion de Servicio\n";
-    cout << "2. Eliminar Estaciones de Servicio\n";
-    cout << "3. Calcular el monto total de las ventas en cada E/S del pais\n";
-    cout << "4. Fijar los precios del combustible para toda la red\n";
-    cout << "Opcion: ";
-}
-
-// Funcion para mostrar el menu de gestion de las estaciones de servicio
-void mostrar_menu_estaciones_servicio() {
-    cout << "\nEscoja una opcion:\n";
-    cout << "0. Salir\n";
-    cout << "1. Agregar Surtidor\n";
-    cout << "2. Eliminar Surtidor\n";
-    cout << "3. Activar Surtidor\n";
-    cout << "4. Desactivar Surtidor\n";
-    cout << "5. Consultar el historico de transacciones\n";
-    cout << "6. Reportar la cantidad de litros vendida\n";
-    cout << "Opcion: ";
-}
-
-
-void manejar_menu_gestion_Red() {
-    uint16_t opcion = 0;
-    bool validacion = false;
-    bool entradaValida = false;  // Variable para controlar las entradas validas
-
-    while (!validacion) {
-        try {
-            mostrar_menu_gestion_Red();
-            cin >> opcion;
-
-            // Verificar si la entrada es válida
-            if (cin.fail()) {
-                throw invalid_argument("Entrada no valida. Por favor ingrese un numero.");
-            }
-
-            // Validar que la opcion esté dentro del rango
-            if (opcion > 4) {
-                throw out_of_range("Opcion fuera de rango. Por favor ingrese un numero entre 0 y 4.");
-            }
-
-            validacion = true;  // Si la opción es correcta, salir del ciclo
-
-            // Procesar la opción seleccionada
-            switch (opcion) {
-            case 0:
-                cout << "Saliendo de gestion de Red..." << endl;
-                break;
-            case 1: {
-                // Limpiar el buffer antes de usar getline
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
-                string Nombre;
-                string Gerente;
-                unsigned short int Region;
-                float Lat;
-                float Long;
-
-                // Obtener el nombre de la estación
-                cout << "\nIngrese el Nombre de la Estacion: ";
-                do {
-                    getline(cin, Nombre);
-                    if (Nombre.empty())
-                        cout << "\nEl nombre no puede estar vacio. Intentelo de nuevo: ";
-                } while (Nombre.empty());
-
-                // Obtener el nombre del gerente
-                cout << "\nIngrese el Nombre del Gerente: ";
-                do {
-                    getline(cin, Gerente);
-                    if (Gerente.empty())
-                        cout << "\nEl nombre no puede estar vacio. Intentelo de nuevo: ";
-                } while (Gerente.empty());
-
-                entradaValida = false;
-
-                // Obtener la region
-                while (!entradaValida) {
-                    cout << "\nIngrese la Region de la Estacion:\n1. Norte\n2. Centro\n3. Sur\n";
-                    cin >> Region;
-                    entradaValida = OpcionValida<short unsigned int>(Region, 3, 1);
-                }
-
-                entradaValida = false;
-
-                // Obtener la latitud
-                while (!entradaValida) {
-                    cout << "\nIngrese la Latitud en grados de la estacion (valor entre -180 y 180)\n";
-                    cin >> Lat;
-                    entradaValida = OpcionValida<float>(Lat, 180, -180);
-                }
-
-                entradaValida = false;
-
-                // Obtener la longitud
-                while (!entradaValida) {
-                    cout << "\nIngrese la Longitud en grados de la estacion (valor entre -180 y 180)\n";
-                    cin >> Long;
-                    entradaValida = OpcionValida<float>(Long, 180, -180);
-                }
-
-                entradaValida = false;
-
-                // Mostrar los datos ingresados
-                cout << "Estos son los datos de la estacion a agregar:\n"
-                     << "\nNombre: " << Nombre << endl
-                     << "Gerente: " << Gerente << endl;
-
-                cout << "Region: ";
-                switch (Region) {
-                case 1:
-                    cout << "Norte\n";
-                    break;
-                case 2:
-                    cout << "Centro\n";
-                    break;
-                case 3:
-                    cout << "Sur\n";
-                    break;
-                }
-
-                cout << "\nCoordenadas:\n"
-                     << "\tLatitud: " << Lat << endl
-                     << "\tLongitud: " << Long << endl;
-
-                short unsigned int Agregar;
-
-                // Confirmación de agregar la estación
-                while (!entradaValida) {
-                    cout << "\nEsta seguro que desea agregar esta estacion?\n1. Si, Agregar\n2. No, Cancelar\n";
-                    cin >> Agregar;
-                    entradaValida = OpcionValida<short unsigned int>(Agregar, 2, 1);
-                }
-
-                // Dependiendo de la confirmación, mostrar el resultado
-                if (Agregar == 1) {
-                    cout << "Agregando la estacion..." << endl;
-                } else {
-                    cout << "Cancelando la operacion..." << endl;
-                }
-                break;  // Importante: Salir del `switch` después de procesar la opción
-            }
-
-            case 2:
-                cout << "Eliminando Estacion de Servicio" << endl;
-                break;
-            case 3:
-                cout << "Calculando el monto total de las ventas" << endl;
-                break;
-            case 4:
-                cout << "Fijando los precios del combustible" << endl;
-                break;
-            default:
-                cout << "Opcion invalida." << endl;
-                break;
-            }
-
-        } catch (const invalid_argument& e) {
-            cout << e.what() << endl;
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        } catch (const out_of_range& e) {
-            cout << e.what() << endl;
-        }
-    }
-}
-
-void manejar_menu_estaciones_servicio() {
-    uint16_t opcion = 0;
-    bool validacion = false;
-
-    while (!validacion) {
-        try {
-            mostrar_menu_estaciones_servicio();
-            cin >> opcion;
-
-            // Verificar si la entrada es válida
-            if (cin.fail()) {
-                throw invalid_argument("Entrada no valida. Por favor ingrese un numero.");
-            }
-
-            // Validar que la opcion esté dentro del rango
-            if (opcion > 6) {
-                throw out_of_range("Opcion fuera de rango. Por favor ingrese un numero entre 0 y 6.");
-            }
-
-            validacion = true;  // Si la opción es correcta, salir del ciclo
-
-            // Procesar la opción seleccionada
-            switch (opcion) {
-            case 0:
-                cout << "Saliendo de gestion de Estaciones de Servicio..." << endl;
-                break;
-            case 1:
-                cout << "Agregando Surtidor" << endl;
-                break;
-            case 2:
-                cout << "Eliminando Surtidor" << endl;
-                break;
-            case 3:
-                cout << "Activando Surtidor" << endl;
-                break;
-            case 4:
-                cout << "Desactivando Surtidor" << endl;
-                break;
-            case 5:
-                cout << "Consultando el historico de transacciones" << endl;
-                break;
-            case 6:
-                cout << "Reportando la cantidad de litros vendida" << endl;
-                break;
-            default:
-                // No deberia ocurrir, pero por seguridad
-                cout << "Opcion invalida." << endl;
-                break;
-            }
-
-        } catch (const invalid_argument& e) {
-            cout << e.what() << endl;
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        } catch (const out_of_range& e) {
-            cout << e.what() << endl;
-        }
-    }
-}
+void manejar_menu_gestion_Red(Red_nacional &TerMax);
+void manejar_menu_estaciones_servicio(Estacion_servicio* estacion_actual);
 
 // ============================================================
 // Main
@@ -266,7 +23,7 @@ void manejar_menu_estaciones_servicio() {
 
 int main() {
     // Instancia de la clase Red_nacional (debe estar definida en el archivo "Red_nacional.h")
-    Red_nacional Red;
+    Red_nacional TerMax;
 
     // Variables para controlar el flujo del programa
     bool salir = false;              // Bandera para salir del programa
@@ -315,23 +72,94 @@ int main() {
             break;
 
         case 1:
-            manejar_menu_gestion_Red();
+            manejar_menu_gestion_Red(TerMax);
             break;
 
-        case 2:
-            manejar_menu_estaciones_servicio();
-            break;
+        case 2: {
+            if (TerMax.obtener_numero_estaciones() == 0) {
+                cout << "\nNo hay estaciones creadas, no se puede acceder a estas opciones\n";
+            } else {
+                cout << endl << "Estaciones disponibles: " << endl;
+                uint16_t Est = -1;
 
-        case 3:
-            cout << "Simulacion de ventas" << endl;
+                // Mostrar estaciones disponibles
+                for (uint16_t i = 0; i < TerMax.obtener_numero_estaciones(); i++) {
+                    cout << i + 1 << ". " << TerMax.obtener_estacion(i)->obtener_nombre()
+                    << " (" << TerMax.obtener_estacion(i)->obtener_codigo() << ')' << endl;
+                }
+
+                // Validar la entrada del usuario
+                while (true) {
+                    cout << "\nIngrese el numero que corresponde a la estacion a la que desea acceder:" << endl;
+                    cin >> Est;
+
+                    if (cin.fail() || Est < 1 || Est > TerMax.obtener_numero_estaciones()) {
+                        cin.clear(); // Limpia el estado de error de cin
+                        cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Ignora el resto de la entrada
+                        cout << "Entrada invalida. Intente nuevamente.\n";
+                    } else {
+                        break; // Entrada válida
+                    }
+                }
+
+                // Acceder al menú de la estación seleccionada
+                do {
+                    Estacion_servicio* estacion_actual = TerMax.obtener_estacion(Est - 1);
+                    manejar_menu_estaciones_servicio(estacion_actual);
+                    break;
+                } while (false);
+            }
             break;
+        }
+
+
+        case 3: {
+            if (TerMax.obtener_numero_estaciones() == 0) {
+                cout << endl << "No se puede simular una venta ya que no hay estaciones creadas." << endl;
+            } else {
+                uint16_t estacion_simular = -1;
+
+                // Mostrar la lista de estaciones disponibles
+                cout << endl << "Estaciones Disponibles:" << endl;
+                for (uint16_t i = 0; i < TerMax.obtener_numero_estaciones(); i++) {
+                    cout << i + 1 << ". " << TerMax.obtener_estacion(i)->obtener_nombre() << " (" << TerMax.obtener_estacion(i)->obtener_codigo() << ')' << endl;
+                }
+
+                // Solicitar el número de la estación y validar la entrada
+                do {
+                    cout << "\nIngrese el numero que corresponde a la estacion a la que desea acceder:" << endl;
+                    cin >> estacion_simular;
+
+                    // Validar que la opción esté dentro del rango permitido
+                    if (estacion_simular < 1 || estacion_simular > TerMax.obtener_numero_estaciones()) {
+                        cout << "Opcion invalida. Intentelo de nuevo." << endl;
+                    }
+
+                } while (estacion_simular < 1 || estacion_simular > TerMax.obtener_numero_estaciones());
+
+                // Obtener la estación seleccionada
+                Estacion_servicio* estacion_actual = TerMax.obtener_estacion(estacion_simular - 1);
+
+                // Verificar si hay surtidores en la estación
+                if (estacion_actual->obtener_numero_surtidores() == 0) {
+                    cout << endl << "No se puede simular una venta ya que no hay surtidores en esta estacion." << endl;
+                } else {
+                    // Simular una venta aleatoria de uno de los tres tipos de combustible
+                    uint16_t categoria_combustible = rand() % 3;
+                    estacion_actual->simular_venta(TerMax.obtener_precio(estacion_actual->obtener_region(), categoria_combustible), categoria_combustible);
+                }
+            }
+            break;  // Salir del case
+        }
+
 
         default:
             cout << "Opcion invalida. Esto no deberia ocurrir." << endl;
             break;
         }
 
-    } while (!salir);  // Repetir hasta que el usuario elija salir
+    } while (!salir);
 
     return 0;  // Fin del programa
 }
+
